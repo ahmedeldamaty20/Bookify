@@ -88,7 +88,6 @@ export async function parsePDFFile(file: File) {
     }
 
     await firstPage.render({
-      canvasContext: context,
       viewport: viewport,
       canvas: canvas,
     }).promise;
@@ -125,4 +124,7 @@ export async function parsePDFFile(file: File) {
   }
 }
 
-
+// Escape regex special characters to prevent ReDoS attacks
+export const escapeRegex = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};

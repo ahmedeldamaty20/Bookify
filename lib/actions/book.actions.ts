@@ -3,7 +3,7 @@
 import { TextSegment } from './../../types.d';
 import { connectToDatabase } from "@/database/mongoose";
 import { CreateBook } from "@/types";
-import { generateSlug, serializeData } from "../utils";
+import { escapeRegex, generateSlug, serializeData } from "../utils";
 import Book from "@/database/models/book.model";
 import BookSegment from '@/database/models/book-segment.model';
 
@@ -66,7 +66,7 @@ export const saveBookSegments = async (bookId: string, clerkId: string, segments
     // Update the totalSegments count in the Book document
     await Book.findByIdAndUpdate(bookId, { $inc: { totalSegments: insertedSegments.length } });
 
-    console.log(`Successfully saved ${insertedSegments.length} segments for book ${bookId}. Total segments now: ${segmentsToInsert.length}`);
+    console.log(`Successfully saved ${insertedSegments.length} segments for book ${bookId}.`);
 
     return { success: true, data: serializeData(insertedSegments) };
   }
@@ -79,3 +79,35 @@ export const saveBookSegments = async (bookId: string, clerkId: string, segments
   }
 
 }
+
+export const getAllBooks = async (search?: string) => {
+  try {
+      await connectToDatabase();
+
+      let query = {};
+
+      if (search) {
+          const escapedSearch = escapeRegex(search);
+          const regex = new RegExp(escapedSearch, 'i');
+          query = {
+              $or: [
+                  { title: { $regex: regex } },
+                  { author: { $regex: regex } },
+              ]
+          };
+      }
+
+      const books = await Book.find(query).sort({ createdAt: -1 }).lean();
+
+      return {
+          success: true,
+          data: serializeData(books)
+      }
+  } catch (e) {
+      console.error('Error connecting to database', e);
+      return {
+          success: false, error: e
+      }
+  }
+}
+

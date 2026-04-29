@@ -1,8 +1,10 @@
+import type { Document, Types } from "mongoose";
+
 /* Global Type Declarations */
 export interface BookCardProps {
   title: string;
   author: string;
-  coverURL: string;
+  coverURL?: string;
   slug: string;
 }
 
@@ -16,7 +18,7 @@ export interface IBook extends Document {
   persona?: string;
   fileURL: string;
   fileBlobKey: string;
-  coverURL: string;
+  coverURL?: string;
   coverBlobKey?: string;
   fileSize: number;
   totalSegments: number;

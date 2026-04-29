@@ -328,6 +328,7 @@
   /* Form Buttons */
   .form-btn {
     @apply w-full! h-14 rounded-[10px] bg-[#663820] cursor-pointer hover:bg-[#7a4528] text-xl text-white font-bold transition-colors;
+    
     font-family: 'IBM Plex Serif', serif;
   }
 }

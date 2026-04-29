@@ -1,4 +1,3 @@
-import { useAuth } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import { handleUpload, HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";

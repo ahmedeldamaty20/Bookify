@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { boolean, z } from 'zod'
+import { z } from 'zod'
 import { Upload, FileUp, X, Volume2 } from 'lucide-react'
 import { useAuth } from '@clerk/nextjs'
 import { toast } from 'sonner'
@@ -104,6 +104,11 @@ export default function UploadForm() {
     try {
       // Check book exist
       const existsCheckResponse = await checkBookExists(data.title)
+      if (!existsCheckResponse.success) {
+        toast.error('Failed to check if book exists. Please try again.')
+        setIsSubmitting(false)
+        return
+      }
       if (existsCheckResponse.exists) {
         toast.error('A book with this title already exists')
         router.push(`/books/${existsCheckResponse.data.slug}`)
