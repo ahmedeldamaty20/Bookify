@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+:root {
+
+  /* Warm Text Colors */
+  --bg-primary: #f8f4e9;
+  --bg-secondary: #fff6e5;
+  --text-primary: #212a3b;
+  --text-secondary: #3d485e;
+  --text-muted: #222c37;
+
+  /* Base theme colors */ 
+  --background: #f8f4e9;
+  --foreground: #212a3b;
+
+  /* Brand accent (warm brown) - for active states and CTAs */
+  --color-brand: #663820;
+  --color-brand-hover: #7a4528;
+
+  /* Borders */
+  --border-subtle: rgba(33, 42, 59, 0.12);
+  --border-medium: rgba(33, 42, 59, 0.2);
+
+  /* Soft Shadows */
+  --shadow-soft-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-soft-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --shadow-soft-lg: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12);
+  --shadow-book: 0px 10px 30px 0px rgba(0, 0, 0, 0.1);
+
+  /* Warm Accent */
+  --accent-warm: #212a3b;
+  --accent-warm-hover: #3d485e;
+  --accent-light: #fff6e5;
+
+  /* Layout dimensions */
+  --navbar-height: 74px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--bg-primary);
+  --font-sans: var(--font-mona-sans);
+  --font-mono: var(--font-ibm-plex-serif);
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1918;
+    --foreground: #f7f4ee;
+  }
+} */
+
+@layer utilities {
+  .wrapper {
+    @apply max-w-7xl px-5 mx-auto w-full;
+  }
+
+  /* Layout utilities */
+  .navbar-height {
+    @apply h-(--navbar-height);
+  }
+  /* Navbar Components */
+  .logo-text {
+    @apply font-semibold text-xl hidden sm:block text-black;
+  }
+  .nav-link-base {
+    @apply cursor-pointer text-base font-medium leading-6 transition-all;
+  }
+  .nav-link-active {
+    @apply text-(--color-brand) border-b-2 border-(--color-brand) pb-0.5;
+  }
+  .nav-user-link {
+    @apply flex items-center gap-1 hover:opacity-70 transition-opacity;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    @apply w-full py-12 md:py-20 px-4 bg-primary;
+  }
+
+  .hero-container {
+    @apply max-w-7xl rounded-md mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-center bg-[#f3e4c7];
+    padding: 40px 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Left Section */
+  .hero-left {
+    @apply flex flex-col gap-5 text-center md:text-left;
+  }
+
+  .hero-title {
+    @apply text-5xl md:text-6xl font-bold text-foreground leading-tight;
+    font-family: Georgia, serif;
+  }
+
+  .hero-description {
+    @apply text-lg md:text-xl;
+    color: #4a5568;
+    line-height: 1.6;
+  }
+
+  .hero-button {
+    @apply w-fit px-6 py-3 bg-white text-foreground cursor-pointer border-none rounded-lg font-semibold text-base transition-all duration-200 flex items-center gap-2 mx-auto md:mx-0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero-button:hover {
+    @apply bg-[#f0f0f0];
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .hero-button span {
+    @apply text-xl font-bold text-(--color-brand);
+  }
+
+  /* Center Section - Illustration */
+  .hero-center {
+    @apply flex justify-center items-center md:col-span-1;
+  }
+
+  .hero-illustration {
+    @apply w-full h-auto max-w-sm;
+  }
+
+  /* Right Section - Steps Card */
+  .hero-right {
+    @apply flex justify-center;
+  }
+
+  .steps-card {
+    @apply flex flex-col gap-6 bg-white rounded-2xl p-6 shadow-md w-full max-w-sm;
+  }
+
+  .step-item {
+    @apply flex items-start gap-4;
+  }
+
+  .step-number {
+    @apply shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base;
+    background-color: var(--bg-primary);
+    color: var(--color-brand);
+    min-width: 40px;
+  }
+
+  .step-content {
+    @apply flex flex-col gap-1;
+  }
+
+  .step-title {
+    @apply font-semibold text-base;
+    color: var(--foreground);
+  }
+
+  .step-description {
+    @apply text-sm;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .hero-container {
+      @apply grid-cols-1 gap-6 py-8 px-6;
+      padding: 30px 20px;
+    }
+
+    .hero-title {
+      @apply text-4xl md:text-5xl;
+    }
+
+    .hero-description {
+      @apply text-base md:text-lg;
+    }
+  }
+
+  /* Library */
+
+  .library-books-grid {
+    @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 md:gap-x-10 gap-y-7 md:gap-y-9;
+  }
+
+  .library-empty-card {
+    @apply bg-(--bg-secondary) rounded-[14px] p-12 max-w-md mx-auto;
+  }
+
+  .book-card {
+    @apply flex flex-col transition-all duration-200 h-full border-0;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  .book-card-cover-wrapper {
+    @apply relative bg-white rounded-[14px] overflow-hidden flex items-center justify-center h-51.25 md:h-60;
+  }
+  
+  .book-card-cover {
+    @apply w-auto h-42.5 md:h-50 object-cover rounded-lg;
+    box-shadow: var(--shadow-book);
+  }
+
+  .book-card-meta {
+    @apply mt-4 md:mt-5 flex-1 flex flex-col gap-1;
+  }
+
+  .book-card-title {
+    @apply font-bold text-[#212a3b] line-clamp-1 text-base md:text-xl leading-5.5 md:leading-7.5;
+    font-family: 'IBM Plex Serif', serif;
+  }
+
+  .book-card-author {
+    @apply text-sm md:text-base font-medium text-[#3d485e] line-clamp-1;
+  }
+
+  /* New Book Form */
+
+  .page-title-xl {
+    @apply text-4xl md:text-5xl font-semibold text-black tracking-[-0.02em] leading-13.5 font-serif;
+  }
+  .subtitle {
+    @apply text-xl text-(--text-secondary) leading-7;
+  }
+  .new-book-wrapper {
+    @apply mx-auto max-w-2xl space-y-6 mt-12 mb-20;
+  }
+  .form-label {
+    @apply text-lg font-medium text-black mb-2 block;
+  }
+  .form-label {
+    @apply text-lg font-medium text-black mb-2 block;
+  }
+  .form-input {
+    @apply w-full p-4 bg-white rounded-lg text-lg font-medium text-[#222] placeholder:text-[#999];
+  }
+
+  /* Upload Dropzone */
+  .upload-dropzone {
+    @apply flex flex-col items-center justify-center h-41.25 bg-white rounded-md cursor-pointer transition-all;
+
+    &:hover {
+      @apply bg-gray-50;
+    }
+  }
+  .upload-dropzone-icon {
+    @apply w-12 h-12 mb-2 text-[#8B7355];
+  }
+  .upload-dropzone-text {
+    @apply text-[#777] text-lg font-medium text-center;
+  }
+  .upload-dropzone-hint {
+    @apply text-[#777] text-sm mt-1;
+  }
+  .upload-dropzone-remove {
+    @apply flex items-center justify-center w-6 h-6 text-red-500 transition-colors cursor-pointer;
+
+    &:hover {
+      @apply text-red-600;
+    }
+  }
+
+  /* Loading State */
+
+  .loading-wrapper {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
+  }
+  .loading-shadow-wrapper {
+    @apply rounded-xl p-10 w-fit md:min-w-md;
+  }
+  .loading-shadow {
+    @apply rounded-xl flex flex-col items-center space-y-6;
+  }
+  .loading-animation {
+    @apply animate-spin origin-center mx-auto;
+  }
+  .loading-title {
+    @apply text-2xl font-bold text-primary;
+  }
+  .loading-progress {
+    @apply w-full space-y-2 text-sm;
+  }
+  .loading-progress-item {
+    @apply flex justify-center items-center space-x-2;
+  }
+  .loading-progress-status {
+    @apply w-2 h-2 text-(--text-secondary) bg-(--success) rounded-full animate-pulse;
+  }
+
+  /* Voice Selector */
+  
+  .voice-selector-options {
+    @apply flex gap-4;
+  }
+  .voice-selector-option {
+    @apply flex-1 flex items-center justify-center gap-3 p-4 border border-(--border-subtle) rounded-lg cursor-pointer transition-all;
+    box-shadow: var(--shadow-soft-sm);
+
+    &:hover {
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-2px);
+    }
+  }
+  .voice-selector-option-selected {
+    @apply bg-(--accent-light) border-(--accent-warm);
+  }
+  .voice-selector-option-default {
+    @apply bg-white;
+
+    &:hover {
+      @apply bg-(--bg-secondary);
+    }
+  }
+  .voice-selector-option-disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
