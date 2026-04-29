@@ -19,11 +19,9 @@ const HeroSection = () => {
           <p className="hero-description">
             Convert your books into interactive AI conversations. Listen, learn, and discuss your favorite reads.
           </p>
-          <button className="hero-button">
-            <Link href="/books/new">
-              <span className="pr-1">+</span> <span>Add new book</span>
-            </Link>
-          </button>
+          <Link href="/books/new" className="hero-button">
+            <span className="pr-1">+</span> <span>Add new book</span>
+          </Link>
         </div>
 
         {/* Center Section - Illustration */}

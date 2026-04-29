@@ -5,6 +5,9 @@
   /* Warm Text Colors */
   --bg-primary: #f8f4e9;
   --bg-secondary: #fff6e5;
+  --bg-card: #ffffff;
+  
+  /* Text Colors */
   --text-primary: #212a3b;
   --text-secondary: #3d485e;
   --text-muted: #222c37;
@@ -20,6 +23,10 @@
   /* Borders */
   --border-subtle: rgba(33, 42, 59, 0.12);
   --border-medium: rgba(33, 42, 59, 0.2);
+
+  /* Semantic Colors */
+  --success: #7c9a82;
+  --warning: #d4a853;
 
   /* Soft Shadows */
   --shadow-soft-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -231,8 +238,8 @@
   .form-label {
     @apply text-lg font-medium text-black mb-2 block;
   }
-  .form-label {
-    @apply text-lg font-medium text-black mb-2 block;
+  .form-input {
+    @apply w-full p-4 bg-white rounded-lg text-lg font-medium text-[#222] placeholder:text-[#999];
   }
   .form-input {
     @apply w-full p-4 bg-white rounded-lg text-lg font-medium text-[#222] placeholder:text-[#999];

@@ -32,27 +32,18 @@ export default function UploadForm() {
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
 
-  const form = useForm<BookUploadFormData>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BookUploadFormData>({
     resolver: zodResolver(bookUploadSchema),
     defaultValues: {
       voice: 'dave',
     },
   })
-
-  type UploadFormValues = z.infer<typeof bookUploadSchema>
-
-  const {
-    control,
-    watch,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<UploadFormValues>({
-    resolver: zodResolver(bookUploadSchema),
-    defaultValues: {
-      voice: 'rachel',
-    },
-  })
+ 
 
   const onPdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -61,7 +52,7 @@ export default function UploadForm() {
       if (file.size > 50 * 1024 * 1024) {
         setPdfError('PDF must be less than 50MB')
         setPdfFile(null)
-      } else if (!file.type.includes('pdf')) {
+      } else if (file.type !== 'application/pdf') {
         setPdfError('Please upload a valid PDF file')
         setPdfFile(null)
       } else {
@@ -148,7 +139,7 @@ export default function UploadForm() {
       )}
 
       <div className="new-book-wrapper">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* PDF Upload */}
           <div className="space-y-2">
             <label className="form-label">PDF File Upload</label>
@@ -231,10 +222,10 @@ export default function UploadForm() {
               type="text"
               placeholder="ex: Rich Dad Poor Dad"
               className="form-input border border-[var(--border-subtle)]"
-              {...form.register('title')}
+              {...register('title')}
             />
-            {form.formState.errors.title && (
-              <span className="text-red-500 text-sm">{form.formState.errors.title.message}</span>
+            {errors.title && (
+              <span className="text-red-500 text-sm">{errors.title.message}</span>
             )}
           </div>
 
@@ -244,11 +235,11 @@ export default function UploadForm() {
             <input
               type="text"
               placeholder="ex: Robert Kiyosaki"
-              className="form-input border border-[var(--border-subtle)]"
-              {...form.register('author')}
+              className="form-input border border-(--border-subtle)"
+              {...register('author')}
             />
-            {form.formState.errors.author && (
-              <span className="text-red-500 text-sm">{form.formState.errors.author.message}</span>
+            {errors.author && (
+              <span className="text-red-500 text-sm">{errors.author.message}</span>
             )}
           </div>
 
