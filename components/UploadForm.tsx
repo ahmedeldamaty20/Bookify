@@ -3,8 +3,14 @@
 import { useState } from 'react'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { boolean, z } from 'zod'
 import { Upload, FileUp, X, Volume2 } from 'lucide-react'
+import { useAuth } from '@clerk/nextjs'
+import { toast } from 'sonner'
+import { checkBookExists, createBook, saveBookSegments } from '@/lib/actions/book.actions'
+import { useRouter } from 'next/navigation'
+import { parsePDFFile } from '@/lib/utils'
+import { upload } from '@vercel/blob/client'
 
 // Zod validation schema
 const bookUploadSchema = z.object({
@@ -31,6 +37,8 @@ export default function UploadForm() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
+  const { userId } = useAuth()
+  const router = useRouter()
 
   const {
     control,
@@ -79,34 +87,105 @@ export default function UploadForm() {
   }
 
   const onSubmit: SubmitHandler<BookUploadFormData> = async (data) => {
+    // Ensure user is authenticated
+    if (!userId) {
+      toast.error('You must be signed in to upload a book')
+      return
+    }
+    
     // Validate PDF file is selected
     if (!pdfFile) {
       setPdfError('PDF file is required')
+      toast.error('Please select a PDF file to upload')
       return
     }
 
     setIsSubmitting(true)
     try {
-      // Create FormData for file upload
-      const formData = new FormData()
-      formData.append('pdf', pdfFile)
-      if (coverFile) {
-        formData.append('coverImage', coverFile)
+      // Check book exist
+      const existsCheckResponse = await checkBookExists(data.title)
+      if (existsCheckResponse.exists) {
+        toast.error('A book with this title already exists')
+        router.push(`/books/${existsCheckResponse.data.slug}`)
+        setIsSubmitting(false)
+        return
       }
-      formData.append('title', data.title)
-      formData.append('author', data.author)
-      formData.append('voice', data.voice)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log('Form submitted with files:', {
-        ...data,
-        pdf: pdfFile.name,
-        coverImage: coverFile?.name || 'auto-generate',
+      const pdfTitle = data.title.trim().toLowerCase().replace(/\s+/g, '-')
+      const parsedPdf = await parsePDFFile(pdfFile)
+
+      if (!parsedPdf || parsedPdf.content.length === 0) {
+        toast.error("Failed to extract content from PDF. Please ensure the file is a valid PDF and try again.")
+        setIsSubmitting(false)
+        return
+      }
+
+      const uploadedPdfBlob = await upload(pdfTitle, pdfFile, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
+        contentType: 'application/pdf'
+      });
+
+      let coverUrl: string | undefined = undefined
+      if(coverFile && coverFile.size > 0){
+        const uploadedCoverBlob = await upload(`${pdfTitle}-cover`, coverFile, {
+          access: 'public',
+          handleUploadUrl: '/api/upload',
+          contentType: coverFile.type
+        });
+        coverUrl = uploadedCoverBlob.url
+      }
+      else{
+        const response = await fetch(parsedPdf.cover)
+        coverUrl = response.url
+        const blob = await response.blob()
+
+        const uploadedCoverBlob = await upload(`${pdfTitle}-cover`, blob, {
+          access: 'public',
+          handleUploadUrl: '/api/upload',
+          contentType: blob.type
+        });
+        coverUrl = uploadedCoverBlob.url
+      }
+
+      const book = await createBook({
+        clerkId: userId,
+        title: data.title,
+        author: data.author,
+        persona: data.voice,
+        fileURL: uploadedPdfBlob.url,
+        fileBlobKey: uploadedPdfBlob.pathname,
+        coverURL: coverUrl,
+        fileSize: pdfFile.size,
       })
-      // Handle form submission here
-    } catch (error) {
+
+      if(!book || !book.success){
+        toast.error('Failed to create book. Please try again.')
+        setIsSubmitting(false)
+        return
+      }
+
+      if(book.alreadyExists){
+        toast.error('A book with this title already exists')
+        router.push(`/books/${book.data.slug}`)
+        setIsSubmitting(false)
+        return
+      }
+
+      const segments = await saveBookSegments(book.data._id, userId, parsedPdf.content)
+
+      if(!segments.success){
+        toast.error("Failed to save book segments.")
+        setIsSubmitting(false)
+        return
+      }
+
+      toast.success('Book uploaded and processed successfully!')
+      router.push(`/books/${book.data.slug}`)
+    } 
+    catch (error) {
       console.error('Error submitting form:', error)
+      toast.error('Failed to upload book')
     } finally {
       setIsSubmitting(false)
     }
@@ -117,7 +196,7 @@ export default function UploadForm() {
       {/* Loading Overlay */}
       {isSubmitting && (
         <div className="loading-wrapper">
-          <div className="loading-shadow-wrapper bg-[var(--bg-card)]">
+          <div className="loading-shadow-wrapper bg-(--bg-card)">
             <div className="loading-shadow">
               <div className="loading-animation">
                 <Upload className="w-12 h-12 text-[#663820]" />
@@ -221,7 +300,7 @@ export default function UploadForm() {
             <input
               type="text"
               placeholder="ex: Rich Dad Poor Dad"
-              className="form-input border border-[var(--border-subtle)]"
+              className="form-input border border-(--border-subtle)"
               {...register('title')}
             />
             {errors.title && (
@@ -331,7 +410,7 @@ export default function UploadForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="form-btn disabled:opacity-75 disabled:cursor-not-allowed"
+            className="form-btn"
           >
             Begin Synthesis
           </button>
